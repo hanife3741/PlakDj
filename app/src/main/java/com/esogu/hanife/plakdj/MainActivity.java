@@ -9,6 +9,8 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Chronometer;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -30,73 +32,33 @@ public class MainActivity extends ActionBarActivity {
         disc = (ProgressBar) findViewById(R.id.progressBar);
         kronometre = (Chronometer) findViewById(R.id.chronometer);
        final MediaPlayer player = MediaPlayer.create(MainActivity.this, R.raw.kalimba);
+       final Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.progressbar);
         disc.setOnTouchListener(new View.OnTouchListener() {
 
-            private float currX;
-            private float currY;
-
             public boolean onTouch(View v, MotionEvent event) {
-                float x1 = 0, x2, y1 = 0, y2, dx, dy , oldx =0,oldy=0;
-                String direction;
+
                 int eventaction = event.getAction();
                 switch (eventaction) {
                     case MotionEvent.ACTION_DOWN:
                      // finger touches the screen
-                        oldx = event.getX();
-                        oldy = event.getY();
-                        player.start();
+                       // player.start();
                         kronometre.start();
+
 
                     case MotionEvent.ACTION_MOVE:
                         // finger moves on the screen
-                        x2 = event.getX();
-                        y2 = event.getY();
-                        dx = x2-x1;
-                        dy = y2-y1;
-                        if(Math.abs(dx) > Math.abs(dy)) {
-                            if(dx>0) {
-                                direction = "right";
-                                Log.e("right...","moving..");
-                            }else{
-                                direction = "left";
-                                Log.e("left...","moving..");
-
-                            }
-                        } else {
-                            if (dy > 0) {
-                                direction = "down";
-                                Log.e("down...", "moving..");
-
-                                currX = event.getRawX();
-                                currY = event.getRawY();
-
-                                Log.e("x=", "" + (currX - oldx));
-                                Log.e("y=", "" + (currY - oldy));
-
-
-                                ViewGroup.MarginLayoutParams marginParams = new ViewGroup.MarginLayoutParams(v.getLayoutParams());
-                                marginParams.setMargins((int) (currX - oldx), (int) (currY - oldy), 0, 0);
-
-                                RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(marginParams);
-                                v.setLayoutParams(layoutParams);
-
-
-                            } else {
-                                direction = "up";
-                                Log.e("up...", "moving..");
-                            }
-                            player.isPlaying();
-                        }
-                        kronometre.start();
-                        break;
+                            player.start();
+                            kronometre.start();
+                        disc.startAnimation(animation);
 
                         case MotionEvent.ACTION_UP:
                         // finger leaves the screen
                         player.pause();
                         kronometre.stop();
-                        break;
+                        disc.clearAnimation();
+
                 }
-                return false;
+                return onTouch(v,event);
             }
         });
     }
